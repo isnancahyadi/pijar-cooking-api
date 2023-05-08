@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const db = require('./config');
+const response = require('./response');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}));
@@ -13,12 +14,7 @@ app.use(bodyParser.json());
 // users
 app.get('/user', async function (req, res) {
     const query = await db`SELECT * FROM users`;
-
-    res.json({
-        status: true,
-        message: "Get data success",
-        data: query
-    })
+    response(200, 'OK', 'Get all data success', query, res);
 })
 
 // root

@@ -53,7 +53,38 @@ app.post('/user', async (req, res) => {
         query = await db`INSERT INTO users ${db(payLoad, "fullname", "email", "password", "phoneNumber", "profilePicture")} returning *`;
     }
 
-    response(201, 'OK', 'User has created', query, res);
+    response(201, 'OK', 'User has been created', query, res);
+});
+
+app.patch('/user/:id', async (req, res) => {
+    const {
+        params: {id},
+        body: {fullname, email, password, phoneNumber, profilePicture}
+    } = req;
+
+    if (isNaN(id)) {
+        response(400, 'ERROR', 'Invalid ID', [], res);
+        return;
+    }
+
+    const getSelectedData = await db`SELECT * FROM users WHERE id = ${id}`;
+
+    if (!getSelectedData?.length) {
+        response(404, 'ERROR', 'ID not found', [], res);
+        return;
+    }
+
+    const payLoad = {
+        fullname: fullname ?? getSelectedData[0].fullname,
+        email: email ?? getSelectedData[0].email,
+        password: password ?? getSelectedData[0].password,
+        phoneNumber: phoneNumber ?? getSelectedData[0].phoneNumber,
+        profilePicture: profilePicture ?? getSelectedData[0].profilePicture
+    };
+
+    const query = await db`UPDATE users set ${db(payLoad, "fullname", "email", "password", "phoneNumber", "profilePicture")} WHERE id = ${id} returning *`;
+
+    response(201, 'OK', 'User has been updated', query, res);
 });
 
 // root

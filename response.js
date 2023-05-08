@@ -1,14 +1,9 @@
-const response = (statusCode, status, message, payLoad, res) => {
-    res.json(statusCode, [
+const response = (statusCode, stat, message, payLoad, res) => {
+    res.status(statusCode).json([
         {
-            status,
+            status: stat,
             message,
-            payLoad,
-            metadata: {
-                prev: "",
-                next: "",
-                curr: ""
-            }
+            payLoad
         }
     ]);
 };

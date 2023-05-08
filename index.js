@@ -35,6 +35,27 @@ app.get('/user/:id', async (req, res) => {
     }
 });
 
+app.post('/user', async (req, res) => {
+    const {fullname, email, password, phoneNumber, profilePicture} = req.body;
+
+    if (!(fullname && email && password && phoneNumber)) {
+        response(400, 'ERROR', 'Please complete all of field', [], res);
+        return;
+    }
+
+    let payLoad, query;
+
+    if (profilePicture === undefined) {
+        payLoad = {fullname, email, password, phoneNumber};
+        query = await db`INSERT INTO users ${db(payLoad, "fullname", "email", "password", "phoneNumber")} returning *`;
+    } else {
+        payLoad = {fullname, email, password, phoneNumber, profilePicture};
+        query = await db`INSERT INTO users ${db(payLoad, "fullname", "email", "password", "phoneNumber", "profilePicture")} returning *`;
+    }
+
+    response(201, 'OK', 'User has created', query, res);
+});
+
 // root
 app.get('/', function (req, res) {
     res.send('Hello World');

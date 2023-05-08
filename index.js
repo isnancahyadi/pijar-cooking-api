@@ -107,6 +107,12 @@ app.delete('/user/:id', async (req, res) => {
     response(200, 'OK', 'User has been deleted', query, res);
 });
 
+// recipes
+app.get('/recipe', async (req, res) => {
+    const query = await db`SELECT * FROM recipes`;
+    response(200, 'OK', 'Get all data success', query, res);
+});
+
 // root
 app.get('/', function (req, res) {
     res.send('Hello World');

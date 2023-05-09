@@ -152,6 +152,36 @@ app.post('/recipe', async (req, res) => {
     response(201, 'OK', 'Recipe has been created', query, res);
 });
 
+app.patch('/recipe/:id', async (req, res) => {
+    const {
+        params: {id},
+        body: {title, ingredients, image, video}
+    } = req;
+
+    if (isNaN(id)) {
+        response(400, 'ERROR', 'Invalid ID', [], res);
+        return;
+    }
+
+    const getSelectedData = await db`SELECT * FROM recipes WHERE id = ${id}`;
+
+    if (!getSelectedData?.length) {
+        response(404, 'ERROR', 'ID not found', [], res);
+        return;
+    }
+
+    const payLoad = {
+        title: title ?? getSelectedData[0].title,
+        ingredients: ingredients ?? getSelectedData[0].ingredients,
+        image: image ?? getSelectedData[0].image,
+        video: video ?? getSelectedData[0].video
+    };
+
+    const query = await db`UPDATE recipes set ${db(payLoad, "title", "ingredients", "image", "video")} WHERE id = ${id} returning *`;
+
+    response(201, 'OK', 'Recipe has been updated', query, res);
+});
+
 // root
 app.get('/', function (req, res) {
     res.send('Hello World');

@@ -13,8 +13,13 @@ app.use(bodyParser.json());
 // routes
 // users
 app.get('/user', async (req, res) => {
-    const query = await db`SELECT * FROM users`;
-    response(200, 'OK', 'Get all data success', query, res);
+    try {
+        const query = await db`SELECT * FROM users`;
+
+        response(200, 'OK', 'Get all data success', query, res);
+    } catch (error) {
+        response(500, 'ERROR', 'Error in server', [], res);
+    }
 });
 
 app.get('/user/:id', async (req, res) => {
@@ -25,13 +30,17 @@ app.get('/user/:id', async (req, res) => {
         return;
     }
 
-    const query = await db`SELECT * FROM users WHERE id = ${id}`;
+    try {
+        const query = await db`SELECT * FROM users WHERE id = ${id}`;
 
-    if (!query?.length) {
-        response(404, 'ERROR', 'ID not found', [], res);
-        return;
-    } else {
-        response(200, 'OK', 'Get data success', query, res);
+        if (!query?.length) {
+            response(404, 'ERROR', 'ID not found', [], res);
+            return;
+        } else {
+            response(200, 'OK', 'Get data success', query, res);
+        }
+    } catch (error) {
+        response(500, 'ERROR', 'Error in server', [], res);
     }
 });
 
@@ -45,15 +54,19 @@ app.post('/user', async (req, res) => {
 
     let payLoad, query;
 
-    if (profilePicture === undefined) {
-        payLoad = {fullname, email, password, phoneNumber};
-        query = await db`INSERT INTO users ${db(payLoad, "fullname", "email", "password", "phoneNumber")} returning *`;
-    } else {
-        payLoad = {fullname, email, password, phoneNumber, profilePicture};
-        query = await db`INSERT INTO users ${db(payLoad, "fullname", "email", "password", "phoneNumber", "profilePicture")} returning *`;
+    try {
+        if (profilePicture === undefined) {
+            payLoad = {fullname, email, password, phoneNumber};
+            query = await db`INSERT INTO users ${db(payLoad, "fullname", "email", "password", "phoneNumber")} returning *`;
+        } else {
+            payLoad = {fullname, email, password, phoneNumber, profilePicture};
+            query = await db`INSERT INTO users ${db(payLoad, "fullname", "email", "password", "phoneNumber", "profilePicture")} returning *`;
+        }
+    
+        response(201, 'OK', 'User has been created', query, res);
+    } catch (error) {
+        response(500, 'ERROR', 'Error in server', [], res);
     }
-
-    response(201, 'OK', 'User has been created', query, res);
 });
 
 app.patch('/user/:id', async (req, res) => {
@@ -67,24 +80,28 @@ app.patch('/user/:id', async (req, res) => {
         return;
     }
 
-    const getSelectedData = await db`SELECT * FROM users WHERE id = ${id}`;
+    try {
+        const getSelectedData = await db`SELECT * FROM users WHERE id = ${id}`;
 
-    if (!getSelectedData?.length) {
-        response(404, 'ERROR', 'ID not found', [], res);
-        return;
+        if (!getSelectedData?.length) {
+            response(404, 'ERROR', 'ID not found', [], res);
+            return;
+        }
+
+        const payLoad = {
+            fullname: fullname ?? getSelectedData[0].fullname,
+            email: email ?? getSelectedData[0].email,
+            password: password ?? getSelectedData[0].password,
+            phoneNumber: phoneNumber ?? getSelectedData[0].phoneNumber,
+            profilePicture: profilePicture ?? getSelectedData[0].profilePicture
+        };
+    
+        const query = await db`UPDATE users set ${db(payLoad, "fullname", "email", "password", "phoneNumber", "profilePicture")} WHERE id = ${id} returning *`;
+    
+        response(201, 'OK', 'User has been updated', query, res);
+    } catch (error) {
+        response(500, 'ERROR', 'Error in server', [], res);
     }
-
-    const payLoad = {
-        fullname: fullname ?? getSelectedData[0].fullname,
-        email: email ?? getSelectedData[0].email,
-        password: password ?? getSelectedData[0].password,
-        phoneNumber: phoneNumber ?? getSelectedData[0].phoneNumber,
-        profilePicture: profilePicture ?? getSelectedData[0].profilePicture
-    };
-
-    const query = await db`UPDATE users set ${db(payLoad, "fullname", "email", "password", "phoneNumber", "profilePicture")} WHERE id = ${id} returning *`;
-
-    response(201, 'OK', 'User has been updated', query, res);
 });
 
 app.delete('/user/:id', async (req, res) => {
@@ -95,22 +112,31 @@ app.delete('/user/:id', async (req, res) => {
         return;
     }
 
-    const getSelectedData = await db`SELECT * FROM users WHERE id = ${id}`;
+    try {
+        const getSelectedData = await db`SELECT * FROM users WHERE id = ${id}`;
 
-    if (!getSelectedData?.length) {
-        response(404, 'ERROR', 'ID not found', [], res);
-        return;
+        if (!getSelectedData?.length) {
+            response(404, 'ERROR', 'ID not found', [], res);
+            return;
+        }
+
+        const query = await db`DELETE FROM users WHERE id = ${id} returning *`;
+
+        response(200, 'OK', 'User has been deleted', query, res);
+    } catch (error) {
+        response(500, 'ERROR', 'Error in server', [], res);
     }
-
-    const query = await db`DELETE FROM users WHERE id = ${id} returning *`;
-
-    response(200, 'OK', 'User has been deleted', query, res);
 });
 
 // recipes
 app.get('/recipe', async (req, res) => {
-    const query = await db`SELECT * FROM recipes`;
-    response(200, 'OK', 'Get all data success', query, res);
+    try {
+        const query = await db`SELECT * FROM recipes`;
+
+        response(200, 'OK', 'Get all data success', query, res);
+    } catch (error) {
+        response(500, 'ERROR', 'Error in server', [], res);
+    }
 });
 
 app.get('/recipe/:id', async (req, res) => {
@@ -121,13 +147,17 @@ app.get('/recipe/:id', async (req, res) => {
         return;
     }
 
-    const query = await db`SELECT * FROM recipes WHERE id = ${id}`;
+    try {
+        const query = await db`SELECT * FROM recipes WHERE id = ${id}`;
 
-    if (!query?.length) {
-        response(404, 'ERROR', 'ID not found', [], res);
-        return;
-    } else {
-        response(200, 'OK', 'Get data success', query, res);
+        if (!query?.length) {
+            response(404, 'ERROR', 'ID not found', [], res);
+            return;
+        } else {
+            response(200, 'OK', 'Get data success', query, res);
+        }
+    } catch (error) {
+        response(500, 'ERROR', 'Error in server', [], res);
     }
 });
 
@@ -141,15 +171,19 @@ app.post('/recipe', async (req, res) => {
 
     let payLoad, query;
 
-    if (video === undefined) {
-        payLoad = {title, ingredients, image};
-        query = await db`INSERT INTO recipes ${db(payLoad, "title", "ingredients", "image")} returning *`;
-    } else {
-        payLoad = {title, ingredients, image, video};
-        query = await db`INSERT INTO recipes ${db(payLoad, "title", "ingredients", "image", "video")} returning *`;
+    try {
+        if (video === undefined) {
+            payLoad = {title, ingredients, image};
+            query = await db`INSERT INTO recipes ${db(payLoad, "title", "ingredients", "image")} returning *`;
+        } else {
+            payLoad = {title, ingredients, image, video};
+            query = await db`INSERT INTO recipes ${db(payLoad, "title", "ingredients", "image", "video")} returning *`;
+        }
+    
+        response(201, 'OK', 'Recipe has been created', query, res);
+    } catch (error) {
+        response(500, 'ERROR', 'Error in server', [], res);
     }
-
-    response(201, 'OK', 'Recipe has been created', query, res);
 });
 
 app.patch('/recipe/:id', async (req, res) => {
@@ -163,23 +197,27 @@ app.patch('/recipe/:id', async (req, res) => {
         return;
     }
 
-    const getSelectedData = await db`SELECT * FROM recipes WHERE id = ${id}`;
+    try {
+        const getSelectedData = await db`SELECT * FROM recipes WHERE id = ${id}`;
 
-    if (!getSelectedData?.length) {
-        response(404, 'ERROR', 'ID not found', [], res);
-        return;
+        if (!getSelectedData?.length) {
+            response(404, 'ERROR', 'ID not found', [], res);
+            return;
+        }
+
+        const payLoad = {
+            title: title ?? getSelectedData[0].title,
+            ingredients: ingredients ?? getSelectedData[0].ingredients,
+            image: image ?? getSelectedData[0].image,
+            video: video ?? getSelectedData[0].video
+        };
+
+        const query = await db`UPDATE recipes set ${db(payLoad, "title", "ingredients", "image", "video")} WHERE id = ${id} returning *`;
+
+        response(201, 'OK', 'Recipe has been updated', query, res);
+    } catch (error) {
+        response(500, 'ERROR', 'Error in server', [], res);
     }
-
-    const payLoad = {
-        title: title ?? getSelectedData[0].title,
-        ingredients: ingredients ?? getSelectedData[0].ingredients,
-        image: image ?? getSelectedData[0].image,
-        video: video ?? getSelectedData[0].video
-    };
-
-    const query = await db`UPDATE recipes set ${db(payLoad, "title", "ingredients", "image", "video")} WHERE id = ${id} returning *`;
-
-    response(201, 'OK', 'Recipe has been updated', query, res);
 });
 
 app.delete('/recipe/:id', async (req, res) => {
@@ -190,16 +228,20 @@ app.delete('/recipe/:id', async (req, res) => {
         return;
     }
 
-    const getSelectedData = await db`SELECT * FROM recipes WHERE id = ${id}`;
+    try {
+        const getSelectedData = await db`SELECT * FROM recipes WHERE id = ${id}`;
 
-    if (!getSelectedData?.length) {
-        response(404, 'ERROR', 'ID not found', [], res);
-        return;
+        if (!getSelectedData?.length) {
+            response(404, 'ERROR', 'ID not found', [], res);
+            return;
+        }
+
+        const query = await db`DELETE FROM recipes WHERE id = ${id} returning *`;
+
+        response(200, 'OK', 'Recipe has been deleted', query, res);
+    } catch (error) {
+        response(500, 'ERROR', 'Error in server', [], res);
     }
-
-    const query = await db`DELETE FROM recipes WHERE id = ${id} returning *`;
-
-    response(200, 'OK', 'Recipe has been deleted', query, res);
 });
 
 // root

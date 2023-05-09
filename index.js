@@ -113,6 +113,24 @@ app.get('/recipe', async (req, res) => {
     response(200, 'OK', 'Get all data success', query, res);
 });
 
+app.get('/recipe/:id', async (req, res) => {
+    const id = req.params.id;
+    
+    if (isNaN(id)) {
+        response(400, 'ERROR', 'Invalid ID', [], res);
+        return;
+    }
+
+    const query = await db`SELECT * FROM recipes WHERE id = ${id}`;
+
+    if (!query?.length) {
+        response(404, 'ERROR', 'ID not found', [], res);
+        return;
+    } else {
+        response(200, 'OK', 'Get data success', query, res);
+    }
+});
+
 // root
 app.get('/', function (req, res) {
     res.send('Hello World');

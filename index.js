@@ -131,6 +131,27 @@ app.get('/recipe/:id', async (req, res) => {
     }
 });
 
+app.post('/recipe', async (req, res) => {
+    const {title, ingredients, image, video} = req.body;
+
+    if (!(title && ingredients && image)) {
+        response(400, 'ERROR', 'Please complete all of field', [], res);
+        return;
+    }
+
+    let payLoad, query;
+
+    if (video === undefined) {
+        payLoad = {title, ingredients, image};
+        query = await db`INSERT INTO recipes ${db(payLoad, "title", "ingredients", "image")} returning *`;
+    } else {
+        payLoad = {title, ingredients, image, video};
+        query = await db`INSERT INTO recipes ${db(payLoad, "title", "ingredients", "image", "video")} returning *`;
+    }
+
+    response(201, 'OK', 'Recipe has been created', query, res);
+});
+
 // root
 app.get('/', function (req, res) {
     res.send('Hello World');

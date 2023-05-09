@@ -182,6 +182,26 @@ app.patch('/recipe/:id', async (req, res) => {
     response(201, 'OK', 'Recipe has been updated', query, res);
 });
 
+app.delete('/recipe/:id', async (req, res) => {
+    const id = req.params.id;
+
+    if (isNaN(id)) {
+        response(400, 'ERROR', 'Invalid ID', [], res);
+        return;
+    }
+
+    const getSelectedData = await db`SELECT * FROM recipes WHERE id = ${id}`;
+
+    if (!getSelectedData?.length) {
+        response(404, 'ERROR', 'ID not found', [], res);
+        return;
+    }
+
+    const query = await db`DELETE FROM recipes WHERE id = ${id} returning *`;
+
+    response(200, 'OK', 'Recipe has been deleted', query, res);
+});
+
 // root
 app.get('/', function (req, res) {
     res.send('Hello World');

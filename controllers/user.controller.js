@@ -1,17 +1,19 @@
 const model = require("../models/user.model");
 const response = require("../response");
+const paginate = require("../middleware/pagination.middleware");
 
 const getUsers = async (req, res) => {
   try {
     const query = await model.getUsers();
     if (query) {
-      response(200, "OK", "Get all data success", query, res);
+      response(200, "OK", "Get all data success", paginate(req, query), res);
       return;
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
       return;
     }
   } catch (error) {
+    console.log(error);
     response(400, "ERROR", "Awww... Something wrong...", null, res);
     return;
   }

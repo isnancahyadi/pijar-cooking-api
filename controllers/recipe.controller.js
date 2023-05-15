@@ -1,16 +1,20 @@
 const model = require("../models/recipe.model");
 const response = require("../response");
+const paginate = require("../middleware/pagination.middleware");
 
 const getRecipes = async (req, res) => {
   try {
     const query = await model.getRecipes();
     if (query) {
-      response(200, "OK", "Get all data success", query, res);
+      response(200, "OK", "Get all data success", paginate(req, query), res);
+      return;
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
   } catch (error) {
     response(400, "ERROR", "Awww... Something wrong...", null, res);
+    return;
   }
 };
 
@@ -31,12 +35,15 @@ const getSpecifiedRecipe = async (req, res) => {
         return;
       } else {
         response(200, "OK", "Get data success", query, res);
+        return;
       }
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
   } catch (error) {
     response(500, "ERROR", "Error in server", [], res);
+    return;
   }
 };
 
@@ -54,11 +61,14 @@ const createRecipe = async (req, res) => {
 
     if (query) {
       response(201, "OK", "User has been created", null, res);
+      return;
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
   } catch (error) {
     response(400, "ERROR", "Awww... Something wrong...", null, res);
+    return;
   }
 };
 
@@ -83,6 +93,7 @@ const updateRecipe = async (req, res) => {
       }
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
 
     const payLoad = {
@@ -96,11 +107,14 @@ const updateRecipe = async (req, res) => {
 
     if (query) {
       response(201, "OK", "Recipe has been updated", null, res);
+      return;
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
   } catch (error) {
     response(400, "ERROR", "Awww... Something wrong...", null, res);
+    return;
   }
 };
 
@@ -122,17 +136,21 @@ const deleteRecipe = async (req, res) => {
       }
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
 
     const query = await model.deleteRecipe(id);
 
     if (query) {
       response(200, "OK", "Recipe has been deleted", null, res);
+      return;
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
   } catch (error) {
     response(400, "ERROR", "Awww... Something wrong...", null, res);
+    return;
   }
 };
 

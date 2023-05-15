@@ -6,11 +6,14 @@ const getUsers = async (req, res) => {
     const query = await model.getUsers();
     if (query) {
       response(200, "OK", "Get all data success", query, res);
+      return;
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
   } catch (error) {
     response(400, "ERROR", "Awww... Something wrong...", null, res);
+    return;
   }
 };
 
@@ -31,12 +34,15 @@ const getSpecifiedUser = async (req, res) => {
         return;
       } else {
         response(200, "OK", "Get data success", query, res);
+        return;
       }
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
   } catch (error) {
     response(400, "ERROR", "Awww... Something wrong...", null, res);
+    return;
   }
 };
 
@@ -49,6 +55,18 @@ const createUser = async (req, res) => {
   }
 
   try {
+    const getEmailUser = await model.getEmailUser(email);
+
+    if (getEmailUser) {
+      if (getEmailUser?.length) {
+        response(409, "ERROR", "Email already registered", null, res);
+        return;
+      }
+    } else {
+      response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
+    }
+
     const payLoad = {
       fullname,
       email,
@@ -60,11 +78,14 @@ const createUser = async (req, res) => {
 
     if (query) {
       response(201, "OK", "User has been created", null, res);
+      return;
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
   } catch (error) {
     response(400, "ERROR", "Awww... Something wrong...", null, res);
+    return;
   }
 };
 
@@ -89,6 +110,7 @@ const updateUser = async (req, res) => {
       }
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
 
     const payLoad = {
@@ -103,11 +125,14 @@ const updateUser = async (req, res) => {
 
     if (query) {
       response(201, "OK", "User has been updated", null, res);
+      return;
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
   } catch (error) {
     response(400, "ERROR", "Awww... Something wrong...", null, res);
+    return;
   }
 };
 
@@ -129,17 +154,21 @@ const deleteUser = async (req, res) => {
       }
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
 
     const query = await model.deleteUser(id);
 
     if (query) {
       response(200, "OK", "User has been deleted", null, res);
+      return;
     } else {
       response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
     }
   } catch (error) {
     response(400, "ERROR", "Awww... Something wrong...", null, res);
+    return;
   }
 };
 

@@ -18,6 +18,15 @@ const getSpecifiedUser = async (id) => {
   }
 };
 
+const getEmailUser = async (email) => {
+  try {
+    const query = await db`SELECT * FROM users WHERE email = ${email}`;
+    return query;
+  } catch (error) {
+    return;
+  }
+};
+
 const createUser = async (payLoad) => {
   try {
     if (payLoad.profile_picture === undefined) {
@@ -74,6 +83,7 @@ const deleteUser = async (id) => {
 module.exports = {
   getUsers,
   getSpecifiedUser,
+  getEmailUser,
   createUser,
   updatedUser,
   deleteUser,

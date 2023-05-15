@@ -1,8 +1,21 @@
 const db = require("../config");
 
-const getRecipes = async () => {
+const getRecipes = async (search, sort) => {
+  const sortType = sort === "DESC" ? db`DESC` : db`ASC`;
+
+  if (search) {
+    let keyword = `%${search}%`;
+    try {
+      const query =
+        await db`SELECT * FROM recipes WHERE LOWER(title) LIKE LOWER(${keyword}) ORDER BY title ${sortType}`;
+      return query;
+    } catch (error) {
+      return;
+    }
+  }
+
   try {
-    const query = await db`SELECT * FROM recipes`;
+    const query = await db`SELECT * FROM recipes ORDER BY title ${sortType}`;
     return query;
   } catch (error) {
     return;

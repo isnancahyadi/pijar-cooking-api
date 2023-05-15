@@ -3,8 +3,30 @@ const response = require("../response");
 const paginate = require("../middleware/pagination.middleware");
 
 const getRecipes = async (req, res) => {
+  const sort = (sortType) => {
+    if (sortType) {
+      if (
+        sortType.toLowerCase() === "asc" ||
+        sortType.toLowerCase() === "ascending"
+      ) {
+        return "ASC";
+      } else if (
+        sortType.toLowerCase() === "desc" ||
+        sortType.toLowerCase() === "descending"
+      ) {
+        return "DESC";
+      }
+    } else return "ASC";
+  };
+
+  const search = (keyword) => (keyword ? keyword : false);
+
   try {
-    const query = await model.getRecipes();
+    const query = await model.getRecipes(
+      search(req?.query?.search),
+      sort(req?.query?.sort)
+    );
+
     if (query) {
       response(200, "OK", "Get all data success", paginate(req, query), res);
       return;

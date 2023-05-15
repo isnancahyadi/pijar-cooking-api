@@ -1,8 +1,21 @@
 const db = require("../config");
 
-const getUsers = async () => {
+const getUsers = async (search, sort) => {
+  const sortType = sort === "DESC" ? db`DESC` : db`ASC`;
+
+  if (search) {
+    let keyword = `%${search}%`;
+    try {
+      const query =
+        await db`SELECT * FROM users WHERE LOWER(fullname) LIKE LOWER(${keyword}) ORDER BY fullname ${sortType}`;
+      return query;
+    } catch (error) {
+      return;
+    }
+  }
+
   try {
-    const query = await db`SELECT * FROM users`;
+    const query = await db`SELECT * FROM users ORDER BY fullname ${sortType}`;
     return query;
   } catch (error) {
     return;

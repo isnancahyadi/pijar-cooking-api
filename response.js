@@ -3,7 +3,7 @@ const response = (statusCode, stat, message, payLoad, res) => {
         {
             status: stat,
             message,
-            payLoad
+            ...payLoad && {payload : payLoad}
         }
     ]);
 };

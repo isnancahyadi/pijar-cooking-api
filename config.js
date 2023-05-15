@@ -1,11 +1,11 @@
 const postgres = require('postgres');
 
 const sql = postgres({
-    host: 'localhost',
-    port: 5432,
-    database: 'pijar_cooking',
-    username: 'postgres',
-    password: 'J0K4M313354icui4cu',
+    host: process.env.DATABASE_HOST,
+    port: process.env.DATABASE_PORT,
+    database: process.env.DATABASE_NAME,
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
 });
 
 module.exports = sql;

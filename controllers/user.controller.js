@@ -13,7 +13,6 @@ const getUsers = async (req, res) => {
       return;
     }
   } catch (error) {
-    console.log(error);
     response(400, "ERROR", "Awww... Something wrong...", null, res);
     return;
   }

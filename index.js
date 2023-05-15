@@ -13,10 +13,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // import route
+const authRouth = require("./routes/auth.route");
 const userRoutes = require("./routes/user.route");
 const recipeRoutes = require("./routes/recipe.route");
 
 // use routing
+app.use(authRouth);
 app.use(userRoutes);
 app.use(recipeRoutes);
 

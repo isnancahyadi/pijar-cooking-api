@@ -47,19 +47,21 @@ const createUser = async (payLoad) => {
       await db`INSERT INTO users ${db(
         payLoad,
         "fullname",
-        "email",
-        "password",
-        "phone_number"
+        // "email",
+        // "password",
+        "phone_number",
+        "username"
       )}`;
       return true;
     } else {
       await db`INSERT INTO users ${db(
         payLoad,
         "fullname",
-        "email",
-        "password",
+        // "email",
+        // "password",
         "phone_number",
-        "profile_picture"
+        "profile_picture",
+        "username"
       )}`;
       return true;
     }
@@ -73,8 +75,8 @@ const updatedUser = async (id, payLoad) => {
     await db`UPDATE users set ${db(
       payLoad,
       "fullname",
-      "email",
-      "password",
+      // "email",
+      // "password",
       "phone_number",
       "profile_picture"
     )} WHERE id = ${id}`;

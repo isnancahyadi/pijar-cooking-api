@@ -70,33 +70,35 @@ const getSpecifiedUser = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  const { fullname, email, password, phone_number, profile_picture } = req.body;
+  const { fullname, phone_number, profile_picture, username } = req.body;
 
-  if (!(fullname && email && password && phone_number)) {
+  if (!(fullname && phone_number && username)) {
     response(400, "ERROR", "Please complete all of field", null, res);
     return;
   }
 
   try {
-    const getEmailUser = await model.getEmailUser(email);
+    // const getEmailUser = await model.getEmailUser(email);
 
-    if (getEmailUser) {
-      if (getEmailUser?.length) {
-        response(409, "ERROR", "Email already registered", null, res);
-        return;
-      }
-    } else {
-      response(500, "ERROR", "WOW... Something wrong with server", null, res);
-      return;
-    }
+    // if (getEmailUser) {
+    //   if (getEmailUser?.length) {
+    //     response(409, "ERROR", "Email already registered", null, res);
+    //     return;
+    //   }
+    // } else {
+    //   response(500, "ERROR", "WOW... Something wrong with server", null, res);
+    //   return;
+    // }
 
     const payLoad = {
       fullname,
-      email,
-      password,
+      // email,
+      // password,
       phone_number,
       profile_picture,
+      username,
     };
+
     const query = await model.createUser(payLoad);
 
     if (query) {
@@ -115,7 +117,7 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
   const {
     params: { id },
-    body: { fullname, email, password, phone_number, profile_picture },
+    body: { fullname, phone_number, profile_picture },
   } = req;
 
   if (isNaN(id)) {
@@ -138,8 +140,8 @@ const updateUser = async (req, res) => {
 
     const payLoad = {
       fullname: fullname ?? getSelectedData[0].fullname,
-      email: email ?? getSelectedData[0].email,
-      password: password ?? getSelectedData[0].password,
+      // email: email ?? getSelectedData[0].email,
+      // password: password ?? getSelectedData[0].password,
       phone_number: phone_number ?? getSelectedData[0].phone_number,
       profile_picture: profile_picture ?? getSelectedData[0].profile_picture,
     };

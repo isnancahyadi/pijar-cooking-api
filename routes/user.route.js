@@ -1,10 +1,11 @@
 const router = require("express").Router();
 const controller = require("../controllers/user.controller");
+const middleware = require("../middleware/jwt.middleware");
 
-router.get("/user", controller.getUsers);
-router.get("/user/:id", controller.getSpecifiedUser);
+router.get("/user", middleware, controller.getUsers);
+router.get("/user", middleware, controller.getSpecifiedUser);
 router.post("/user", controller.createUser);
-router.patch("/user/:id", controller.updateUser);
-router.delete("/user/:id", controller.deleteUser);
+router.patch("/user", middleware, controller.updateUser);
+router.delete("/user", middleware, controller.deleteUser);
 
 module.exports = router;

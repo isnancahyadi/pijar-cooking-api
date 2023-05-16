@@ -22,9 +22,9 @@ const getUsers = async (search, sort) => {
   }
 };
 
-const getSpecifiedUser = async (id) => {
+const getSpecifiedUser = async (username) => {
   try {
-    const query = await db`SELECT * FROM users WHERE id = ${id}`;
+    const query = await db`SELECT * FROM users WHERE username = ${username}`;
     return query;
   } catch (error) {
     return;
@@ -70,7 +70,7 @@ const createUser = async (payLoad) => {
   }
 };
 
-const updatedUser = async (id, payLoad) => {
+const updatedUser = async (username, payLoad) => {
   try {
     await db`UPDATE users set ${db(
       payLoad,
@@ -79,16 +79,16 @@ const updatedUser = async (id, payLoad) => {
       // "password",
       "phone_number",
       "profile_picture"
-    )} WHERE id = ${id}`;
+    )} WHERE username = ${username}`;
     return true;
   } catch (error) {
     return;
   }
 };
 
-const deleteUser = async (id) => {
+const deleteUser = async (username) => {
   try {
-    await db`DELETE FROM users WHERE id = ${id}`;
+    await db`DELETE FROM users WHERE username = ${username}`;
     return true;
   } catch (error) {
     return;

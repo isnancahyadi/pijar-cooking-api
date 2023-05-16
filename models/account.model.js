@@ -28,15 +28,10 @@ const regAccount = async (payLoad) => {
 
 const checkAccount = async (username) => {
   try {
-    const getEmail = await db`SELECT * FROM accounts WHERE email = ${username}`;
-    const getUsername =
-      await db`SELECT * FROM accounts WHERE username = ${username}`;
+    const query =
+      await db`SELECT * FROM accounts WHERE username = ${username} OR email = ${username}`;
 
-    if (getEmail || getUsername) {
-      return getEmail ?? getUsername;
-    } else {
-      return 1;
-    }
+    return query ? query : 1;
   } catch (error) {
     return 0;
   }

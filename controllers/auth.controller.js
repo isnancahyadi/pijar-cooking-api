@@ -1,4 +1,5 @@
 const model = require("../models/account.model");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 14;
 const response = require("../response");
@@ -73,7 +74,10 @@ const login = async (req, res) => {
 
     bcrypt.compare(password, checkAccount[0]?.password, (err, result) => {
       if (result) {
-        response(200, "OK", "Login success", null, res);
+        delete checkAccount[0].password;
+        const token = jwt.sign(checkAccount[0], process.env.KEY);
+
+        response(200, "OK", "Login success", { token }, res);
         return;
       } else {
         response(401, "ERROR", "Password invalid", null, res);

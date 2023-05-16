@@ -7,5 +7,6 @@ router.get("/user", middleware, controller.getSpecifiedUser);
 router.post("/user", controller.createUser);
 router.patch("/user", middleware, controller.updateUser);
 router.delete("/user", middleware, controller.deleteUser);
+router.patch("/user/photo", middleware, controller.uploadPhoto);
 
 module.exports = router;

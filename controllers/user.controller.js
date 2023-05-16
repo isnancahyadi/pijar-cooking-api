@@ -2,6 +2,7 @@ const model = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const response = require("../response");
 const paginate = require("../middleware/pagination.middleware");
+const cloudinary = require("../cloudinary");
 
 const getToken = (req) => {
   const token = req?.headers?.authorization?.slice(
@@ -126,6 +127,8 @@ const updateUser = async (req, res) => {
         body: { fullname, phone_number, profile_picture },
       } = req;
 
+      // const { profile_picture } = req?.files;
+
       const getSelectedData = await model.getSpecifiedUser(username);
 
       if (getSelectedData) {
@@ -137,6 +140,44 @@ const updateUser = async (req, res) => {
         response(500, "ERROR", "WOW... Something wrong with server", null, res);
         return;
       }
+
+      // let mimeType = profile_picture.mimetype.split("/")[1];
+      // let allowFile = ["jpeg", "jpg", "png", "webp"];
+
+      // if (!allowFile?.find((item) => item === mimeType)) {
+      //   response(400, "ERROR", "Hey, What are you doing?", null, res);
+      //   return;
+      // }
+
+      // if (profile_picture.size > 2000000) {
+      //   response(400, "ERROR", "Photo is too big", null, res);
+      //   return;
+      // }
+
+      // const upload = cloudinary.uploader.upload(profile_picture.tempFilePath, {
+      //   public_id: new Date().toISOString(),
+      // });
+
+      // upload
+      //   .then(async (data) => {
+      //     const payload = {
+      //       photo: data?.secure_url,
+      //     };
+
+      //     model.editPhotoUser(payload, id);
+
+      //     res.status(200).send({
+      //       status: false,
+      //       message: "Success upload",
+      //       data: payload,
+      //     });
+      //   })
+      //   .catch((err) => {
+      //     res.status(400).send({
+      //       status: false,
+      //       message: err,
+      //     });
+      //   });
 
       const payLoad = {
         fullname: fullname ?? getSelectedData[0].fullname,
@@ -193,10 +234,60 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const uploadPhoto = async (req, res) => {
+  try {
+    jwt.verify(getToken(req), process.env.KEY, async (err, { username }) => {
+      const { photo } = req?.files;
+
+      if (!photo) {
+        response(400, "ERROR", "Photo is required", null, res);
+        return;
+      }
+
+      let mimeType = photo.mimetype.split("/")[1];
+      let allowFile = ["jpeg", "jpg", "png", "webp"];
+
+      if (!allowFile?.find((item) => item === mimeType)) {
+        response(400, "ERROR", "Hey, What are you doing?", null, res);
+        return;
+      }
+
+      if (photo.size > 2000000) {
+        response(400, "ERROR", "Photo is too big", null, res);
+        return;
+      }
+
+      const upload = cloudinary.uploader.upload(photo.tempFilePath, {
+        public_id: new Date().toISOString(),
+      });
+
+      upload
+        .then(async (data) => {
+          const payload = {
+            profile_picture: data?.secure_url,
+          };
+
+          await model.updatePhotoUser(payload, username);
+
+          response(201, "OK", "Photo has been updated", null, res);
+          return;
+        })
+        .catch((err) => {
+          response(400, "ERROR", "Awww... Something wrong...", null, res);
+          return;
+        });
+    });
+  } catch (error) {
+    response(400, "ERROR", "Awww... Something wrong...", null, res);
+    return;
+  }
+};
+
 module.exports = {
   getUsers,
   getSpecifiedUser,
   createUser,
   updateUser,
   deleteUser,
+  uploadPhoto,
 };

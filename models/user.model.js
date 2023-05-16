@@ -95,6 +95,15 @@ const deleteUser = async (username) => {
   }
 };
 
+const updatePhotoUser = async (payLoad, username) => {
+  try {
+    await db`UPDATE users set ${db(
+      payLoad,
+      "profile_picture"
+    )} WHERE username = ${username}`;
+  } catch (error) {}
+};
+
 module.exports = {
   getUsers,
   getSpecifiedUser,
@@ -102,4 +111,5 @@ module.exports = {
   createUser,
   updatedUser,
   deleteUser,
+  updatePhotoUser,
 };

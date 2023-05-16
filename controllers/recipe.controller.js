@@ -1,6 +1,7 @@
 const model = require("../models/recipe.model");
 const response = require("../response");
 const paginate = require("../middleware/pagination.middleware");
+const cloudinary = require("../cloudinary");
 
 const getRecipes = async (req, res) => {
   const sort = (sortType) => {
@@ -70,7 +71,8 @@ const getSpecifiedRecipe = async (req, res) => {
 };
 
 const createRecipe = async (req, res) => {
-  const { title, ingredients, image, video } = req.body;
+  const { title, ingredients, video } = req.body;
+  const { image } = req?.files;
 
   if (!(title && ingredients && image)) {
     response(400, "ERROR", "Please complete all of field", null, res);
@@ -78,16 +80,46 @@ const createRecipe = async (req, res) => {
   }
 
   try {
-    const payLoad = { title, ingredients, image, video };
-    const query = await model.createRecipe(payLoad);
+    let mimeType = image.mimetype.split("/")[1];
+    let allowFile = ["jpeg", "jpg", "png", "webp"];
 
-    if (query) {
-      response(201, "OK", "User has been created", null, res);
-      return;
-    } else {
-      response(500, "ERROR", "WOW... Something wrong with server", null, res);
+    if (!allowFile?.find((item) => item === mimeType)) {
+      response(400, "ERROR", "Hey, What are you doing?", null, res);
       return;
     }
+
+    if (image.size > 2000000) {
+      response(400, "ERROR", "Image is too big", null, res);
+      return;
+    }
+
+    const upload = cloudinary.uploader.upload(image.tempFilePath, {
+      public_id: new Date().toISOString(),
+    });
+
+    upload
+      .then(async (data) => {
+        const payLoad = { title, ingredients, image: data?.secure_url, video };
+        const query = await model.createRecipe(payLoad);
+
+        if (query) {
+          response(201, "OK", "Recipe has been created", null, res);
+          return;
+        } else {
+          response(
+            500,
+            "ERROR",
+            "WOW... Something wrong with server",
+            null,
+            res
+          );
+          return;
+        }
+      })
+      .catch((err) => {
+        response(400, "ERROR", "Awww... Something wrong...", null, res);
+        return;
+      });
   } catch (error) {
     response(400, "ERROR", "Awww... Something wrong...", null, res);
     return;

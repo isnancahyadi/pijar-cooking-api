@@ -26,7 +26,24 @@ const regAccount = async (payLoad) => {
   }
 };
 
+const checkAccount = async (username) => {
+  try {
+    const getEmail = await db`SELECT * FROM accounts WHERE email = ${username}`;
+    const getUsername =
+      await db`SELECT * FROM accounts WHERE username = ${username}`;
+
+    if (getEmail || getUsername) {
+      return getEmail ?? getUsername;
+    } else {
+      return 1;
+    }
+  } catch (error) {
+    return 0;
+  }
+};
+
 module.exports = {
   regAccount,
   getEmailAccount,
+  checkAccount,
 };

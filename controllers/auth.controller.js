@@ -50,6 +50,42 @@ const regAccount = async (req, res) => {
   }
 };
 
+const login = async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!(username && password)) {
+    response(400, "ERROR", "Please complete all of field", null, res);
+    return;
+  }
+
+  try {
+    const checkAccount = await model.checkAccount(username);
+
+    if (checkAccount) {
+      if (!checkAccount?.length || checkAccount === 1) {
+        response(404, "ERROR", "Account not found", null, res);
+        return;
+      }
+    } else {
+      response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
+    }
+
+    bcrypt.compare(password, checkAccount[0]?.password, (err, result) => {
+      if (result) {
+        response(200, "OK", "Login success", null, res);
+        return;
+      } else {
+        response(401, "ERROR", "Password invalid", null, res);
+        return;
+      }
+    });
+  } catch (error) {
+    response(400, "ERROR", "Awww... Something wrong...", null, res);
+  }
+};
+
 module.exports = {
   regAccount,
+  login,
 };

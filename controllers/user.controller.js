@@ -33,22 +33,42 @@ const getUsers = async (req, res) => {
   const search = (keyword) => (keyword ? keyword : false);
 
   try {
-    const query = await model.getUsers(
-      search(req?.query?.search),
-      sort(req?.query?.sort)
-    );
+    jwt.verify(getToken(req), process.env.KEY, async (err, { role_id }) => {
+      if (role_id !== 1) {
+        response(403, "ERROR", "Access denied!!!", null, res);
+        return;
+      }
+      try {
+        const query = await model.getUsers(
+          search(req?.query?.search),
+          sort(req?.query?.sort)
+        );
 
-    if (query) {
-      response(200, "OK", "Get all data success", paginate(req, query), res);
-      return;
-    } else {
-      response(500, "ERROR", "WOW... Something wrong with server", null, res);
-      return;
-    }
-  } catch (error) {
-    response(400, "ERROR", "Awww... Something wrong...", null, res);
-    return;
-  }
+        if (query) {
+          response(
+            200,
+            "OK",
+            "Get all data success",
+            paginate(req, query),
+            res
+          );
+          return;
+        } else {
+          response(
+            500,
+            "ERROR",
+            "WOW... Something wrong with server",
+            null,
+            res
+          );
+          return;
+        }
+      } catch (error) {
+        response(400, "ERROR", "Awww... Something wrong...", null, res);
+        return;
+      }
+    });
+  } catch (error) {}
 };
 
 const getSpecifiedUser = async (req, res) => {

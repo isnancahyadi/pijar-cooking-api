@@ -13,17 +13,30 @@ const regAccount = async (req, res) => {
   }
 
   try {
+    let mail = email.toLowerCase();
     let payLoad = {
       username,
-      email,
+      email: mail,
       password,
     };
 
-    const getEmailAccount = await model.getEmailAccount(email);
+    const getEmailAccount = await model.getEmailAccount(mail);
 
     if (getEmailAccount) {
       if (getEmailAccount?.length) {
         response(409, "ERROR", "Email already registered", null, res);
+        return;
+      }
+    } else {
+      response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
+    }
+
+    const getUsernameAccount = await model.getUsernameAccount(username);
+
+    if (getUsernameAccount) {
+      if (getUsernameAccount?.length) {
+        response(409, "ERROR", "Account already registered", null, res);
         return;
       }
     } else {
@@ -36,9 +49,6 @@ const regAccount = async (req, res) => {
 
       if (query) {
         response(201, "OK", "Account has been created", query, res);
-        return;
-      } else if (!query) {
-        response(409, "ERROR", "Account already registered", null, res);
         return;
       } else {
         response(500, "ERROR", "WOW... Something wrong with server", null, res);

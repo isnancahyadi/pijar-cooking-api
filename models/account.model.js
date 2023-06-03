@@ -5,7 +5,15 @@ const getEmailAccount = async (email) => {
     const query = db`SELECT * FROM accounts WHERE email = ${email}`;
     return query;
   } catch (error) {
-    console.log(error);
+    return;
+  }
+};
+
+const getUsernameAccount = async (username) => {
+  try {
+    const query = db`SELECT * FROM accounts WHERE username = ${username}`;
+    return query;
+  } catch (error) {
     return;
   }
 };
@@ -22,7 +30,7 @@ const regAccount = async (payLoad) => {
 
     return query;
   } catch (error) {
-    return false;
+    return;
   }
 };
 
@@ -40,5 +48,6 @@ const checkAccount = async (username) => {
 module.exports = {
   regAccount,
   getEmailAccount,
+  getUsernameAccount,
   checkAccount,
 };

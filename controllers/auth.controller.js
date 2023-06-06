@@ -87,7 +87,13 @@ const login = async (req, res) => {
         delete checkAccount[0].password;
         const token = jwt.sign(checkAccount[0], process.env.KEY);
 
-        response(200, "OK", "Login success", { token }, res);
+        response(
+          200,
+          "OK",
+          "Login success",
+          { ...checkAccount[0], token },
+          res
+        );
         return;
       } else {
         response(401, "ERROR", "Password invalid", null, res);

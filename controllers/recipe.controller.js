@@ -41,6 +41,23 @@ const getRecipes = async (req, res) => {
   }
 };
 
+const getNewRecipes = async (req, res) => {
+  try {
+    const query = await model.getNewRecipes();
+
+    if (query) {
+      response(200, "OK", "Get all data success", query, res);
+      return;
+    } else {
+      response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
+    }
+  } catch (error) {
+    response(400, "ERROR", "Awww... Something wrong...", null, res);
+    return;
+  }
+};
+
 const getSpecifiedRecipe = async (req, res) => {
   const id = req.params.id;
 
@@ -71,10 +88,10 @@ const getSpecifiedRecipe = async (req, res) => {
 };
 
 const createRecipe = async (req, res) => {
-  const { title, ingredients, video } = req.body;
+  const { title, ingredients, video, direction } = req.body;
   const { image } = req?.files;
 
-  if (!(title && ingredients && image)) {
+  if (!(title && ingredients && image && direction)) {
     response(400, "ERROR", "Please complete all of field", null, res);
     return;
   }
@@ -94,12 +111,19 @@ const createRecipe = async (req, res) => {
     }
 
     const upload = cloudinary.uploader.upload(image.tempFilePath, {
+      folder: "img/recipe",
       public_id: new Date().toISOString(),
     });
 
     upload
       .then(async (data) => {
-        const payLoad = { title, ingredients, image: data?.secure_url, video };
+        const payLoad = {
+          title,
+          ingredients,
+          image: data?.secure_url,
+          video,
+          direction,
+        };
         const query = await model.createRecipe(payLoad);
 
         if (query) {
@@ -210,6 +234,7 @@ const deleteRecipe = async (req, res) => {
 
 module.exports = {
   getRecipes,
+  getNewRecipes,
   getSpecifiedRecipe,
   createRecipe,
   updateRecipe,

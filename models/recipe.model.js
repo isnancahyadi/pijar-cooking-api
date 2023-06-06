@@ -22,6 +22,15 @@ const getRecipes = async (search, sort) => {
   }
 };
 
+const getNewRecipes = async () => {
+  try {
+    const query = await db`SELECT * FROM recipes ORDER BY id DESC LIMIT 1`;
+    return query;
+  } catch (error) {
+    return;
+  }
+};
+
 const getSpecifiedRecipe = async (id) => {
   try {
     const query = await db`SELECT * FROM recipes WHERE id = ${id}`;
@@ -39,7 +48,8 @@ const createRecipe = async (payLoad) => {
         payLoad,
         "title",
         "ingredients",
-        "image"
+        "image",
+        "direction"
       )}`;
       return true;
     } else {
@@ -48,7 +58,8 @@ const createRecipe = async (payLoad) => {
         "title",
         "ingredients",
         "image",
-        "video"
+        "video",
+        "direction"
       )}`;
       return true;
     }
@@ -83,6 +94,7 @@ const deleteRecipe = async (id) => {
 
 module.exports = {
   getRecipes,
+  getNewRecipes,
   getSpecifiedRecipe,
   createRecipe,
   updateRecipe,

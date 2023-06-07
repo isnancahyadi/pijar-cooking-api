@@ -96,57 +96,42 @@ const getSpecifiedUser = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
+  const { fullname, phone_number, profile_picture, username } = req.body;
+
+  if (!(fullname && phone_number)) {
+    response(400, "ERROR", "Please complete all of field", null, res);
+    return;
+  }
+
   try {
-    jwt.verify(getToken(req), process.env.KEY, async (err, { username }) => {
-      const { fullname, phone_number, profile_picture } = req.body;
+    // const getEmailUser = await model.getEmailUser(email);
 
-      if (!(fullname && phone_number)) {
-        response(400, "ERROR", "Please complete all of field", null, res);
-        return;
-      }
+    // if (getEmailUser) {
+    //   if (getEmailUser?.length) {
+    //     response(409, "ERROR", "Email already registered", null, res);
+    //     return;
+    //   }
+    // } else {
+    //   response(500, "ERROR", "WOW... Something wrong with server", null, res);
+    //   return;
+    // }
 
-      try {
-        // const getEmailUser = await model.getEmailUser(email);
+    const payLoad = {
+      fullname,
+      phone_number,
+      profile_picture,
+      username,
+    };
 
-        // if (getEmailUser) {
-        //   if (getEmailUser?.length) {
-        //     response(409, "ERROR", "Email already registered", null, res);
-        //     return;
-        //   }
-        // } else {
-        //   response(500, "ERROR", "WOW... Something wrong with server", null, res);
-        //   return;
-        // }
+    const query = await model.createUser(payLoad);
 
-        const payLoad = {
-          fullname,
-          // email,
-          // password,
-          phone_number,
-          profile_picture,
-          username,
-        };
-
-        const query = await model.createUser(payLoad);
-
-        if (query) {
-          response(201, "OK", "User has been created", null, res);
-          return;
-        } else {
-          response(
-            500,
-            "ERROR",
-            "WOW... Something wrong with server",
-            null,
-            res
-          );
-          return;
-        }
-      } catch (error) {
-        response(400, "ERROR", "Awww... Something wrong...", null, res);
-        return;
-      }
-    });
+    if (query) {
+      response(201, "OK", "User has been created", null, res);
+      return;
+    } else {
+      response(500, "ERROR", "WOW... Something wrong with server", null, res);
+      return;
+    }
   } catch (error) {
     response(400, "ERROR", "Awww... Something wrong...", null, res);
     return;

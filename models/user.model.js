@@ -47,8 +47,6 @@ const createUser = async (payLoad) => {
       await db`INSERT INTO users ${db(
         payLoad,
         "fullname",
-        // "email",
-        // "password",
         "phone_number",
         "username"
       )}`;
@@ -57,8 +55,6 @@ const createUser = async (payLoad) => {
       await db`INSERT INTO users ${db(
         payLoad,
         "fullname",
-        // "email",
-        // "password",
         "phone_number",
         "profile_picture",
         "username"

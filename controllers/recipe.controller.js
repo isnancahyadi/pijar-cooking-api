@@ -1,7 +1,17 @@
 const model = require("../models/recipe.model");
+const jwt = require("jsonwebtoken");
 const response = require("../response");
 const paginate = require("../middleware/pagination.middleware");
 const cloudinary = require("../cloudinary");
+
+const getToken = (req) => {
+  const token = req?.headers?.authorization?.slice(
+    7,
+    req?.headers?.authorization.length
+  );
+
+  return token;
+};
 
 const getRecipes = async (req, res) => {
   const sort = (sortType) => {
@@ -83,6 +93,30 @@ const getSpecifiedRecipe = async (req, res) => {
     }
   } catch (error) {
     response(500, "ERROR", "Error in server", [], res);
+    return;
+  }
+};
+
+const getMyRecipe = async (req, res) => {
+  try {
+    jwt.verify(getToken(req), process.env.KEY, async (err, { username }) => {
+      const query = await model.getMyRecipe(username);
+
+      if (query) {
+        if (!query?.length) {
+          response(404, "ERROR", "Hey, Who are you?", null, res);
+          return;
+        } else {
+          response(200, "OK", "Get data success", query, res);
+          return;
+        }
+      } else {
+        response(500, "ERROR", "WOW... Something wrong with server", null, res);
+        return;
+      }
+    });
+  } catch (error) {
+    response(400, "ERROR", "Awww... Something wrong...", null, res);
     return;
   }
 };
@@ -236,6 +270,7 @@ module.exports = {
   getRecipes,
   getNewRecipes,
   getSpecifiedRecipe,
+  getMyRecipe,
   createRecipe,
   updateRecipe,
   deleteRecipe,

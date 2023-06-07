@@ -40,6 +40,16 @@ const getSpecifiedRecipe = async (id) => {
   }
 };
 
+const getMyRecipe = async (username) => {
+  try {
+    const query =
+      await db`SELECT * FROM recipes WHERE created_by = ${username} ORDER BY id DESC`;
+    return query;
+  } catch (error) {
+    return;
+  }
+};
+
 const createRecipe = async (payLoad) => {
   try {
     if (payLoad.video === undefined) {
@@ -96,6 +106,7 @@ module.exports = {
   getRecipes,
   getNewRecipes,
   getSpecifiedRecipe,
+  getMyRecipe,
   createRecipe,
   updateRecipe,
   deleteRecipe,
